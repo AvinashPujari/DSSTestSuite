@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="2" name="Failed suite [Suite]" parallel="tests">
+  <parameter name="browser" value="chrome"/>
+  <parameter name="version" value="45"/>
+  <listeners>
+    <listener class-name="com.dss.test.reporter.DSSTestReporter"/>
+  </listeners>
+  <test name="DSS-Regression With Chrome(failed)" parallel="tests">
+    <parameter name="browser" value="chrome"/>
+    <parameter name="version" value="45"/>
+    <classes>
+      <class name="com.dss.test.dss.subscription.SubscriptionTests">
+        <methods>
+          <include name="BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithNonSSOR"/>
+          <include name="BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithSSOR"/>
+          <include name="BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithNonSSOR"/>
+          <include name="BuydigitalPlusSubscriptionWithSSOR"/>
+          <include name="BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithSSOR"/>
+          <include name="BuydigitalPlusSubscriptionWithNonSSOR"/>
+          <include name="beforeTest"/>
+        </methods>
+      </class> <!-- com.dss.test.dss.subscription.SubscriptionTests -->
+    </classes>
+  </test> <!-- DSS-Regression With Chrome(failed) -->
+</suite> <!-- Failed suite [Suite] -->
