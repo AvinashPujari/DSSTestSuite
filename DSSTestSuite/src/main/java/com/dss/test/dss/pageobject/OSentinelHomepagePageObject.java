@@ -59,6 +59,19 @@ public class OSentinelHomepagePageObject extends LandingPageObject {
 
 	}
 
+	
+	public boolean isUserAccountMenuIconDisplayed(){
+		boolean accountMenuIcon =false;
+
+		if(driver.findElement(By.xpath("html/body/header/div[1]/div[1]/a[4]"))!= null){
+			driver.findElement(By.xpath("html/body/header/div[1]/div[1]/a[4]")).click();
+			return accountMenuIcon = true;
+		}
+		else{
+			return accountMenuIcon = false;
+		}
+	}
+	
 	@Override
 	public boolean isSubscriptionPopUpDisplayed() throws InterruptedException {
 

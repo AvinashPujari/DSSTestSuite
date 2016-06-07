@@ -83,7 +83,7 @@ public class SubscriptionTests {
 
 	}
 
-	@Test(dataProvider = "dssDataProviderWithInAreaZIPSSOR", dataProviderClass = DSSDataProvider.class, enabled = true)
+	@Test(dataProvider = "dssDataProviderWithInAreaZIPSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
 	public void BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithSSOR(String withInAreaZIP, String email, String CCName,
 			String CCNumber, String CCMonth, String CCYear, String userFirstName, String userLastName,
 			String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
@@ -92,7 +92,7 @@ public class SubscriptionTests {
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Within Area ZIP With SSOR user");
 
 		String thankYouMessage;
-
+		boolean accountMenuIcon = false; 
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
 		OSSubscriptionPage.addPrintDigitalPlusAccessWithinArea(withInAreaZIP);
@@ -114,6 +114,9 @@ public class SubscriptionTests {
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
+		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		Assert.assertTrue(accountMenuIcon);
+		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
@@ -126,6 +129,7 @@ public class SubscriptionTests {
 
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Within Area ZIP With Non-SSOR user");
 		String thankYouMessage;
+		boolean accountMenuIcon = false; 
 
 		Random random = new Random();
 		int randomnum = random.nextInt();
@@ -153,11 +157,14 @@ public class SubscriptionTests {
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
+		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		Assert.assertTrue(accountMenuIcon);
+		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderOutsideAreaZIPSSOR", dataProviderClass = DSSDataProvider.class, enabled = true)
+	@Test(dataProvider = "dssDataProviderOutsideAreaZIPSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
 	public void BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithSSOR(String outSideAreaZIP, String email,
 			String BankName, String BankAccountNumber, String BankRoutingNumber, String userFirstName,
 			String userLastName, String userAddress1, String userAddress2, String UserZIP, String UserCity,
@@ -166,6 +173,7 @@ public class SubscriptionTests {
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Outside Area ZIP With SSOR user");
 
 		String thankYouMessage;
+		boolean accountMenuIcon = false; 
 
 		String OutsideAreaZipValidationMag;
 
@@ -195,11 +203,14 @@ public class SubscriptionTests {
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
+		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		Assert.assertTrue(accountMenuIcon);
+		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderOutsideAreaZIPNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = true)
+	@Test(dataProvider = "dssDataProviderOutsideAreaZIPNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
 	public void BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithNonSSOR(String outSideAreaZIP, String pass,
 			String CCName, String CCNumber, String CCMonth, String CCYear, String userFirstName, String userLastName,
 			String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
@@ -208,7 +219,7 @@ public class SubscriptionTests {
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Outside Area ZIP With Non-SSOR user");
 
 		String thankYouMessage;
-
+		boolean accountMenuIcon = false; 
 		String OutsideAreaZipValidationMag;
 
 		Random random = new Random();
@@ -241,11 +252,14 @@ public class SubscriptionTests {
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
+		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		Assert.assertTrue(accountMenuIcon);
+		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderDigitalPlusSSOR", dataProviderClass = DSSDataProvider.class, enabled = true)
+	@Test(dataProvider = "dssDataProviderDigitalPlusSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
 	public void BuydigitalPlusSubscriptionWithSSOR(String subscription, String email, String CCName, String CCNumber,
 			String CCMonth, String CCYear, String userFirstName, String userLastName, String userAddress1,
 			String userAddress2, String UserZIP, String UserCity, String UserState, String userPhonenmum, String pass)
@@ -254,7 +268,8 @@ public class SubscriptionTests {
 		logger = report.startTest("Subscribe DigitalPlus Subscription With SSOR user");
 
 		String thankYouMessage;
-
+		boolean accountMenuIcon = false; 
+		
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
 		OSSubscriptionPage.addDigitalPlusSubscription();
@@ -277,11 +292,14 @@ public class SubscriptionTests {
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
+		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		Assert.assertTrue(accountMenuIcon);
+		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderDigitalPlusNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = true)
+	@Test(dataProvider = "dssDataProviderDigitalPlusNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
 	public void BuydigitalPlusSubscriptionWithNonSSOR(String subscription, String pass, String BankName,
 			String BankAccountNumber, String BankRoutingNumber, String userFirstName, String userLastName,
 			String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
@@ -290,7 +308,7 @@ public class SubscriptionTests {
 		logger = report.startTest("Subscribe DigitalPlus Subscription With Non-SSOR user");
 
 		String thankYouMessage;
-
+		boolean accountMenuIcon = false; 
 		Random random = new Random();
 		int randomnum = random.nextInt();
 
@@ -319,6 +337,9 @@ public class SubscriptionTests {
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
+		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		Assert.assertTrue(accountMenuIcon);
+		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
