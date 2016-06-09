@@ -6,8 +6,13 @@ package com.dss.test.utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.Random;
+import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -164,6 +169,23 @@ public class DSSUtilities {
 		
 		
 		
+	}
+	
+	public static String generateEmailid(String Market){
+		
+        String emailId;
+        Random random = new Random();
+        int randomnum = random.nextInt();
+
+        DateFormat timeFormat = new SimpleDateFormat("ddMMMMyy");
+        Date date = new Date();
+        timeFormat.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        String currentdate = timeFormat.format(date);
+
+        emailId = Market + "_" + currentdate + "_" + randomnum + "@test.com";
+
+        return emailId;
+
 	}
 	
 	
