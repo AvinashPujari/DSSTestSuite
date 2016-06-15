@@ -19,7 +19,8 @@ import com.dss.test.utilities.DSSUtilities;
  * History of Changes: Data Provider for Subscription Tests
  */
 public class DSSDataProvider {
-	public static Map<String, String> AssignExcelToGlobalVariable() throws IOException
+	@DataProvider(name="TestDataProvider")
+	public static Object[][] AssignExcelToGlobalVariable() throws IOException
 	{
 			File src = new File("C:\\Repositry\\DSSTestSuite\\DataProvider.xlsx");
 			Map<String, String> ExcelData = new HashMap<String, String>();
@@ -35,7 +36,8 @@ public class DSSDataProvider {
 					
 			}
 			
-			return ExcelData;
+			return new Object[][] {{ExcelData}};
+	}
 	}
 	
 	
