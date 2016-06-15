@@ -3,13 +3,19 @@
  */
 package com.dss.test.utilities;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.TimeZone;
@@ -32,6 +38,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.maven.surefire.shade.org.apache.maven.shared.utils.io.FileUtils;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -52,7 +60,7 @@ public class DSSUtilities {
 		Properties properties = System.getProperties();
 		properties.setProperty("mail.smtp.host", "webmail.bitwiseglobal.com");
 		Session session = Session.getDefaultInstance(properties);
-
+		
 		// creates a new e-mail message
 		try {
 			Message msg = new MimeMessage(session);
@@ -167,8 +175,7 @@ public class DSSUtilities {
 			
 		}
 		
-		
-		
+
 	}
 	
 	public static String generateEmailid(String Market){
@@ -187,6 +194,44 @@ public class DSSUtilities {
         return emailId;
 
 	}
+
+	public static void getAuthenticated() throws InterruptedException, AWTException {
+		Robot handle = new Robot();
+		String username1 = DSSProperties.userName;
+		String password1 = DSSProperties.userPassword;
+		Thread.sleep(1000);
+		for (int i = 0; i < username1.length(); i++) {
+			int res = username1.charAt(i);
+			if (res > 96 && res < 123) {
+
+				res = res - 32;
+			} 
+			handle.keyPress(res);
+		}
+
+		handle.keyPress(KeyEvent.VK_TAB);
+		Thread.sleep(1000);
+		for (int i = 0; i < password1.length(); i++) {
+			int res = 0;
+			res = password1.charAt(i);
+			if (res > 96 && res < 123) {
+				res = res - 32;
+				
+				handle.keyPress(res);
+			} else {
+				handle.keyPress(KeyEvent.VK_SHIFT);
+				handle.keyPress(KeyEvent.VK_1);
+				handle.keyRelease(KeyEvent.VK_SHIFT);
+			}
+			
+			
+		}
+		handle.keyPress(KeyEvent.VK_ENTER);
+		
+	}
+	
+	
+	
 	
 	
 	 /*public static void main(String arg[]) throws Exception { 

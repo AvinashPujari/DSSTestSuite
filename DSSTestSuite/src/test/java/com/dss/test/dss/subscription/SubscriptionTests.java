@@ -1,19 +1,33 @@
 package com.dss.test.dss.subscription;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.security.Credentials;
+import org.openqa.selenium.security.UserAndPassword;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import com.dss.test.dss.subscription.*;
 
 import com.dss.test.dataproviders.DSSDataProvider;
 import com.dss.test.dss.pageobject.OSentinelCheckoutPageObject;
@@ -42,133 +56,124 @@ public class SubscriptionTests {
 	private OSentinelSubscriptionPageObject OSSubscriptionPage;
 	private OSentinelCheckoutPageObject OSCheckoutPage;
 	private DSSUtilities util;
+	
+	
 
 	private ExtentReports report = new ExtentReports(DSSProperties.ExtentReportPath);
 
-	@Parameters({ "browser", "version" })
-	@BeforeMethod(alwaysRun = true)
-	public void beforeTest(String browser, String version) throws MalformedURLException {
+	 	@BeforeMethod (alwaysRun = true)
+		@Parameters("browser")
+		public void beforeTest(String browser) throws InterruptedException, IOException
+		{
 
-		DesiredCapabilities caps = new DesiredCapabilities();
+		  if(browser.equalsIgnoreCase("firefox"))
+		  {	  
+		   driver = new FirefoxDriver();
+		  }
+		  
+		  else if(browser.equalsIgnoreCase("chrome"))
+		  {
+			  System.setProperty("webdriver.chrome.driver","C:\\AllJarFiles\\chromedriver.exe");
+			  driver = new ChromeDriver();
+		  }
+		  
+		  else if(browser.equalsIgnoreCase("internet explorer"))
+		  {
+			  System.setProperty("webdriver.ie.driver","C:\\AllJarFiles\\IEDriverServer.exe");
+			  driver = new InternetExplorerDriver();
+		  }
+		  
+		  driver.manage().window().maximize();
+		  driver.get(DSSProperties.URL);
+		  
+		  driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
-		if (browser.equalsIgnoreCase("firefox")) {
-
-			caps.setBrowserName("firefox");
+		  OSHomePage = new OSentinelHomepagePageObject(driver);
+		  OSCheckoutPage = new OSentinelCheckoutPageObject(driver);
+		  util = new DSSUtilities();
+		  
+		  
 		}
-
-		if (browser.equalsIgnoreCase("chrome")) {
-
-			caps.setBrowserName("chrome");
-
-		}
-
-		if (browser.equalsIgnoreCase("internet explorer")) {
-
-			caps.setBrowserName("internet explorer");
-
-		}
-
-		caps.setPlatform(Platform.WINDOWS);
-		caps.setVersion(version);
-
-		driver = new RemoteWebDriver(new URL(DSSProperties.hubUrl), caps);
-
-		driver.manage().window().maximize();
-		driver.get(DSSProperties.URL);
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-
-		OSHomePage = new OSentinelHomepagePageObject(driver);
-		OSCheckoutPage = new OSentinelCheckoutPageObject(driver);
-		util = new DSSUtilities();
-
-	}
-
-	@Test(dataProvider = "dssDataProviderWithInAreaZIPSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
-	public void BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithSSOR(String withInAreaZIP, String email, String CCName,
-			String CCNumber, String CCMonth, String CCYear, String userFirstName, String userLastName,
-			String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
-			String userPhonenmum, String pass) throws InterruptedException {
+	
+	
+	
+	
+	@Test(dataProvider = "TestDataProvider", dataProviderClass = DSSDataProvider.class, enabled = false)
+	public void BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithSSOR(Map<String,String> map) throws Exception {
 
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Within Area ZIP With SSOR user");
 
 		String thankYouMessage;
 		boolean accountMenuIcon = false; 
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
-		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
-		OSSubscriptionPage.addPrintDigitalPlusAccessWithinArea(withInAreaZIP);
+		logger.log(LogStatus.INFO, "Subscription Page is displayed");
+	
+		OSSubscriptionPage.addPrintDigitalPlusAccessWithinArea(map.get("Within Area Zip"));
 		logger.log(LogStatus.INFO, "Entered Within Area ZIP");
-		OSCheckoutPage.enterDigitalAccessSSOR(email);
+	 	OSCheckoutPage.enterDigitalAccessSSOR(map.get("SSOR User"));
 		logger.log(LogStatus.INFO, "Entered SSOR email");
-		OSCheckoutPage.payWithCreditCard(CCName, CCNumber, CCMonth, CCYear);
+		OSCheckoutPage.payWithCreditCard(map.get("Credit Card Holder Name"), map.get("Credit Card No"), map.get("Month"), map.get("Year"));
 		logger.log(LogStatus.INFO, "Entered Credit Card Details");
 
-		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(userFirstName, userLastName, userAddress1,
-				userAddress2, UserZIP, UserCity, UserState, userPhonenmum);
+		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(map.get("First Name"), map.get("Last Name"), map.get("Valid address1"),
+				map.get("Valid address2"), map.get("Within Area Zip"), map.get("City"), map.get("State"), map.get("Contact No"));
 		logger.log(LogStatus.INFO, "Entered Billing Address");
+
 		OSCheckoutPage.placeOrder();
 		logger.log(LogStatus.INFO, "Order Placed");
-		OSCheckoutPage.navigateToHomepageStory(email, pass);
+		OSCheckoutPage.navigateToHomepageStory(map.get("SSOR User"), map.get("Password"));
 
 		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue to LogIn");
 
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
-		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		accountMenuIcon = OSHomePage.isUserLoggedIn(map.get("SSOR User"));
 		Assert.assertTrue(accountMenuIcon);
 		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderWithInAreaZIPNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = true)
-	public void BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithNonSSOR(String withInAreaZIP, String pass,
-			String BankName, String BankAccountNumber, String BankRoutingNumber, String userFirstName,
-			String userLastName, String userAddress1, String userAddress2, String UserZIP, String UserCity,
-			String UserState, String userPhonenmum) throws InterruptedException {
-
+	@Test(dataProvider = "TestDataProvider", dataProviderClass = DSSDataProvider.class, enabled = false)
+	public void BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithNonSSOR(Map<String,String> map) throws InterruptedException {
+	
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Within Area ZIP With Non-SSOR user");
 		String thankYouMessage;
 		boolean accountMenuIcon = false; 
 
-		Random random = new Random();
-		int randomnum = random.nextInt();
-
-		String email = "jan" + randomnum + "@gmail.com";
+		String email = util.generateEmailid(map.get("Market Name"));
 
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
-		OSSubscriptionPage.addPrintDigitalPlusAccessWithinArea(withInAreaZIP);
+		OSSubscriptionPage.addPrintDigitalPlusAccessWithinArea(map.get("Within Area Zip"));
 		logger.log(LogStatus.INFO, "Entered Within Area ZIP");
-		OSCheckoutPage.enterDigitalAccessNonSSOR(email, pass, pass);
+		OSCheckoutPage.enterDigitalAccessNonSSOR(email, map.get("Password"), map.get("Password"));
 		logger.log(LogStatus.INFO, "Entered Non-SSOR email and set password");
-		OSCheckoutPage.payWithMyBankAccount(BankName, BankAccountNumber, BankRoutingNumber);
+		OSCheckoutPage.payWithMyBankAccount(map.get("Bank Name"), map.get("Account No"), map.get("Routing No"));
 		logger.log(LogStatus.INFO, "Entered Bank Account Details");
 
-		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(userFirstName, userLastName, userAddress1,
-				userAddress2, UserZIP, UserCity, UserState, userPhonenmum);
+		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(map.get("First Name"), map.get("Last Name"), map.get("Valid address1"),
+				map.get("Valid address2"), map.get("Within Area Zip"), map.get("City"), map.get("State"), map.get("Contact No"));
 		logger.log(LogStatus.INFO, "Entered Billing Address");
 
 		OSCheckoutPage.placeOrder();
 		logger.log(LogStatus.INFO, "Order Placed");
-		OSCheckoutPage.navigateToHomepageStory(email, pass);
+		OSCheckoutPage.navigateToHomepageStory(email, map.get("Password"));
 		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue reading");
 
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
-		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		accountMenuIcon = OSHomePage.isUserLoggedIn(email);
 		Assert.assertTrue(accountMenuIcon);
 		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderOutsideAreaZIPSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
-	public void BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithSSOR(String outSideAreaZIP, String email,
-			String BankName, String BankAccountNumber, String BankRoutingNumber, String userFirstName,
-			String userLastName, String userAddress1, String userAddress2, String UserZIP, String UserCity,
-			String UserState, String userPhonenmum, String pass) throws InterruptedException {
+	@Test(dataProvider = "TestDataProvider", dataProviderClass = DSSDataProvider.class, enabled = false)
+	public void BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithSSOR(Map<String,String> map) throws InterruptedException {
 
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Outside Area ZIP With SSOR user");
 
@@ -179,42 +184,40 @@ public class SubscriptionTests {
 
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
-		OutsideAreaZipValidationMag = OSSubscriptionPage.availableOptionsForOutsideAreaZip(outSideAreaZIP);
+		OutsideAreaZipValidationMag = OSSubscriptionPage.availableOptionsForOutsideAreaZip(map.get("Out of area Zip"));
 		Assert.assertEquals(DSSProperties.OutsideAreaZipValidationActualMesssage, OutsideAreaZipValidationMag);
-		logger.log(LogStatus.INFO, "Verfying the out of are ZIP error message");
+		logger.log(LogStatus.INFO, "Verifying the out of are ZIP error message");
 		logger.log(LogStatus.PASS, "Out of area zip error message is displayed. Hence validation passed!!");
 
 		OSSubscriptionPage.proceedWithTryDigital();
 		logger.log(LogStatus.INFO, "Proceeding with Try Digital");
 
-		OSCheckoutPage.enterDigitalAccessSSOR(email);
+		OSCheckoutPage.enterDigitalAccessSSOR(map.get("SSOR User"));
 		logger.log(LogStatus.INFO, "Entered SSOR email");
-		OSCheckoutPage.payWithMyBankAccount(BankName, BankAccountNumber, BankRoutingNumber);
+		OSCheckoutPage.payWithMyBankAccount(map.get("Bank Name"), map.get("Account No"), map.get("Routing No"));
 		logger.log(LogStatus.INFO, "Entered Bank Account Details");
 
-		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(userFirstName, userLastName, userAddress1,
-				userAddress2, UserZIP, UserCity, UserState, userPhonenmum);
+		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(map.get("First Name"), map.get("Last Name"), map.get("Valid address1"),
+				map.get("Valid address2"), map.get("Within Area Zip"), map.get("City"), map.get("State"), map.get("Contact No"));
 		logger.log(LogStatus.INFO, "Entered Billing Address");
+
 		OSCheckoutPage.placeOrder();
 		logger.log(LogStatus.INFO, "Order Placed");
-		OSCheckoutPage.navigateToHomepageStory(email, pass);
-		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue to LogIn");
+		OSCheckoutPage.navigateToHomepageStory(map.get("SSOR User"), map.get("Password"));
+		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue reading");
 
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
-		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		accountMenuIcon = OSHomePage.isUserLoggedIn(map.get("SSOR User"));
 		Assert.assertTrue(accountMenuIcon);
 		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderOutsideAreaZIPNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
-	public void BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithNonSSOR(String outSideAreaZIP, String pass,
-			String CCName, String CCNumber, String CCMonth, String CCYear, String userFirstName, String userLastName,
-			String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
-			String userPhonenmum) throws InterruptedException {
+	@Test(dataProvider = "TestDataProvider", dataProviderClass = DSSDataProvider.class, enabled = false)
+	public void BuyPrintPlusDigitalSubscriptionOutSideAreaZIPWithNonSSOR(Map<String,String> map) throws InterruptedException {
 
 		logger = report.startTest("Subscribe Print Plus Digital Subscription Outside Area ZIP With Non-SSOR user");
 
@@ -222,47 +225,43 @@ public class SubscriptionTests {
 		boolean accountMenuIcon = false; 
 		String OutsideAreaZipValidationMag;
 
-		Random random = new Random();
-		int randomnum = random.nextInt();
-
-		String email = "jan" + randomnum + "@gmail.com";
+		String email = util.generateEmailid(map.get("Market Name"));
 
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
-		OutsideAreaZipValidationMag = OSSubscriptionPage.availableOptionsForOutsideAreaZip(outSideAreaZIP);
+		OutsideAreaZipValidationMag = OSSubscriptionPage.availableOptionsForOutsideAreaZip(map.get("Out of area Zip"));
 		Assert.assertEquals(DSSProperties.OutsideAreaZipValidationActualMesssage, OutsideAreaZipValidationMag);
 		logger.log(LogStatus.INFO, "Verfying the out of are ZIP error message");
 		logger.log(LogStatus.PASS, "Out of area zip error message is displayed. Hence validation passed!!");
 
 		OSSubscriptionPage.proceedWithTryDigital();
 		logger.log(LogStatus.INFO, "Proceeding with Try Digital");
-		OSCheckoutPage.enterDigitalAccessNonSSOR(email, pass, pass);
-		logger.log(LogStatus.INFO, "Entered Non-SSOR email and set password");
-		OSCheckoutPage.payWithCreditCard(CCName, CCNumber, CCMonth, CCYear);
+		OSCheckoutPage.enterDigitalAccessNonSSOR(email, map.get("Password"), map.get("Password"));
+		OSCheckoutPage.payWithCreditCard(map.get("Credit Card Holder Name"), map.get("Credit Card No"), map.get("Month"), map.get("Year"));
 		logger.log(LogStatus.INFO, "Entered Credit Card Details");
 
-		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(userFirstName, userLastName, userAddress1,
-				userAddress2, UserZIP, UserCity, UserState, userPhonenmum);
+		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(map.get("First Name"), map.get("Last Name"), map.get("Valid address1"),
+				map.get("Valid address2"), map.get("Within Area Zip"), map.get("City"), map.get("State"), map.get("Contact No"));
 		logger.log(LogStatus.INFO, "Entered Billing Address");
+
 		OSCheckoutPage.placeOrder();
 		logger.log(LogStatus.INFO, "Order Placed");
-		OSCheckoutPage.navigateToHomepageStory(email, pass);
-		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue reading");
+		OSCheckoutPage.navigateToHomepageStory(email, map.get("Password"));
+
+		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue to LogIn");
 
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
-		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		accountMenuIcon = OSHomePage.isUserLoggedIn(email);
 		Assert.assertTrue(accountMenuIcon);
 		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderDigitalPlusSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
-	public void BuydigitalPlusSubscriptionWithSSOR(String subscription, String email, String CCName, String CCNumber,
-			String CCMonth, String CCYear, String userFirstName, String userLastName, String userAddress1,
-			String userAddress2, String UserZIP, String UserCity, String UserState, String userPhonenmum, String pass)
+	@Test(dataProvider = "TestDataProvider", dataProviderClass = DSSDataProvider.class, enabled = false)
+	public void BuydigitalPlusSubscriptionWithSSOR(Map<String,String> map)
 			throws InterruptedException {
 
 		logger = report.startTest("Subscribe DigitalPlus Subscription With SSOR user");
@@ -274,70 +273,69 @@ public class SubscriptionTests {
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
 		OSSubscriptionPage.addDigitalPlusSubscription();
 		logger.log(LogStatus.INFO, "Added DigitalPlus subscription");
-		OSCheckoutPage.selectPackage(driver, subscription);
+		OSCheckoutPage.selectPackage(driver, DSSProperties.DIGITAL_SAVER);
 		logger.log(LogStatus.INFO, "Digital package selected");
-		OSCheckoutPage.enterDigitalAccessSSOR(email);
+		OSCheckoutPage.enterDigitalAccessSSOR(map.get("SSOR User"));
 		logger.log(LogStatus.INFO, "Entered SSOR email");
-		OSCheckoutPage.payWithCreditCard(CCName, CCNumber, CCMonth, CCYear);
+		OSCheckoutPage.payWithCreditCard(map.get("Credit Card Holder Name"), map.get("Credit Card No"), map.get("Month"), map.get("Year"));
 		logger.log(LogStatus.INFO, "Entered Credit Card Details");
 
-		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(userFirstName, userLastName, userAddress1,
-				userAddress2, UserZIP, UserCity, UserState, userPhonenmum);
+		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(map.get("First Name"), map.get("Last Name"), map.get("Valid address1"),
+				map.get("Valid address2"), map.get("Within Area Zip"), map.get("City"), map.get("State"), map.get("Contact No"));
 		logger.log(LogStatus.INFO, "Entered Billing Address");
+
 		OSCheckoutPage.placeOrder();
 		logger.log(LogStatus.INFO, "Order Placed");
-		OSCheckoutPage.navigateToHomepageStory(email, pass);
+		OSCheckoutPage.navigateToHomepageStory(map.get("SSOR User"), map.get("Password"));
+
 		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue to LogIn");
 
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
+		
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
-		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		accountMenuIcon = OSHomePage.isUserLoggedIn(map.get("SSOR User"));
 		Assert.assertTrue(accountMenuIcon);
 		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");
 
 	}
 
-	@Test(dataProvider = "dssDataProviderDigitalPlusNonSSOR", dataProviderClass = DSSDataProvider.class, enabled = false)
-	public void BuydigitalPlusSubscriptionWithNonSSOR(String subscription, String pass, String BankName,
-			String BankAccountNumber, String BankRoutingNumber, String userFirstName, String userLastName,
-			String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
-			String userPhonenmum) throws InterruptedException {
+	@Test(dataProvider = "TestDataProvider", dataProviderClass = DSSDataProvider.class, enabled = true)
+	public void BuydigitalPlusSubscriptionWithNonSSOR(Map<String,String> map) throws InterruptedException {
 
 		logger = report.startTest("Subscribe DigitalPlus Subscription With Non-SSOR user");
 
 		String thankYouMessage;
 		boolean accountMenuIcon = false; 
-		Random random = new Random();
-		int randomnum = random.nextInt();
 
-		String email = "jan" + randomnum + "@gmail.com";
+		String email = util.generateEmailid(map.get("Market Name"));
 
 		OSSubscriptionPage = OSHomePage.goToSubscriptionsFromHomepage();
 		logger.log(LogStatus.INFO, "SubsCription Page is displayed");
 		OSSubscriptionPage.addDigitalPlusSubscription();
 		logger.log(LogStatus.INFO, "Added DigitalPlus subscription");
-		OSCheckoutPage.selectPackage(driver, subscription);
+		OSCheckoutPage.selectPackage(driver, DSSProperties.DIGITAL);
 		logger.log(LogStatus.INFO, "Digital package selected");
-		OSCheckoutPage.enterDigitalAccessNonSSOR(email, pass, pass);
+		OSCheckoutPage.enterDigitalAccessNonSSOR(email, map.get("Password"), map.get("Password"));
 		logger.log(LogStatus.INFO, "Entered Non-SSOR email and set password");
-		OSCheckoutPage.payWithMyBankAccount(BankName, BankAccountNumber, BankRoutingNumber);
-		logger.log(LogStatus.INFO, "Entered Bank Account Details");
+		OSCheckoutPage.payWithCreditCard(map.get("Credit Card Holder Name"), map.get("Credit Card No"), map.get("Month"), map.get("Year"));
+		logger.log(LogStatus.INFO, "Entered Credit Card Details");
 
-		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(userFirstName, userLastName, userAddress1,
-				userAddress2, UserZIP, UserCity, UserState, userPhonenmum);
+		OSCheckoutPage.enterAddressWhenBillingAndDeliveryInformationSame(map.get("First Name"), map.get("Last Name"), map.get("Valid address1"),
+				map.get("Valid address2"), map.get("Within Area Zip"), map.get("City"), map.get("State"), map.get("Contact No"));
 		logger.log(LogStatus.INFO, "Entered Billing Address");
 
 		OSCheckoutPage.placeOrder();
 		logger.log(LogStatus.INFO, "Order Placed");
-		OSCheckoutPage.navigateToHomepageStory(email, pass);
-		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue reading");
+		OSCheckoutPage.navigateToHomepageStory(email, map.get("Password"));
+
+		logger.log(LogStatus.INFO, "Navigating to Home Page by Continue to LogIn");
 
 		thankYouMessage = OSHomePage.getThankYouPanelMessage();
 		Assert.assertEquals(DSSProperties.ActualThankYouMessage, thankYouMessage);
 		logger.log(LogStatus.INFO, "Thank You Panel is displayed");
-		accountMenuIcon = OSHomePage.isUserAccountMenuIconDisplayed();
+		accountMenuIcon = OSHomePage.isUserLoggedIn(email);
 		Assert.assertTrue(accountMenuIcon);
 		logger.log(LogStatus.INFO, "User logged In");
 		logger.log(LogStatus.PASS, "Test Completed Successfully!!");

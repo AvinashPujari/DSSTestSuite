@@ -8,8 +8,11 @@ package com.dss.test.properties;
  */
 public class DSSProperties {
 
+//	public static final String URL = "http://nguxbeta:nguxtr!b@ngux.orlandosentinel.stage.tribdev.com/";
 	public static final String URL = "http://nguxbeta:nguxtr!b@ngux.orlandosentinel.stage.tribdev.com/";
-	public static final String MarketName = "OrlandoSentinel";
+	public static final String userName="nguxbeta";
+	public static final String userPassword="nguxtr!b";
+	public static final String MarketName = "OS";
 	public static final String hubUrl = "http://10.10.121.98:4444/wd/hub";
 	
 	// Subscriptions: Digital, Digital Super Saver, Digital Saver

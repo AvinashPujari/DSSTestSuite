@@ -70,7 +70,7 @@ public class OSentinelHomepagePageObject extends LandingPageObject {
 		String userName ="";
 		int start=Emailid.indexOf('@');
 		String UserName=Emailid.substring(0,start);
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 		if (driver.findElement(By.xpath("html/body/header/div[1]/div[1]/a[4]")) != null) {
 			
 			Actions action = new Actions(driver);

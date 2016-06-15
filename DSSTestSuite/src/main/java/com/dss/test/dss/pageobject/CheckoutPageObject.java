@@ -236,7 +236,7 @@ public abstract class CheckoutPageObject {
 		// SSOR:
 		if ((logInToContinueBtn != null) && (logInToContinueBtn.getText().equals(DSSProperties.LOGIN_TO_CONTINUE))) {
 
-			Thread.sleep(1000);
+			Thread.sleep(3000);
 
 			logInToContinueBtn.click();
 
@@ -258,7 +258,7 @@ public abstract class CheckoutPageObject {
 
 		if ((continueReadingBtn != null) && (continueReadingBtn.getText().equals(DSSProperties.CONTINUE_READING))) {
 
-			Thread.sleep(2000);
+			Thread.sleep(3000);
 			continueReadingBtn.click();
 		}
 
