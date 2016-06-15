@@ -22,10 +22,11 @@ public class DSSDataProvider {
 	@DataProvider(name="TestDataProvider")
 	public static Object[][] AssignExcelToGlobalVariable() throws IOException
 	{
-			File src = new File("C:\\Repositry\\DSSTestSuite\\DataProvider.xlsx");
+			String filePath = System.getProperty("user.dir") + File.separator + "src/main/java" + File.separator + "com/dss/test/dataproviders" + File.separator + "DataProvider.xlsx";
+		       FileInputStream inputStream = new FileInputStream(new File(filePath));
 			Map<String, String> ExcelData = new HashMap<String, String>();
-			FileInputStream finput = new FileInputStream(src);
-			XSSFWorkbook workbook = new XSSFWorkbook(finput);
+			
+			XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
 			XSSFSheet sheet = workbook.getSheet("OS");
 			int row=sheet.getLastRowNum()+1;
 			System.out.println(row);
