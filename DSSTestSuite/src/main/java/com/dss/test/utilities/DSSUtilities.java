@@ -246,7 +246,54 @@ public class DSSUtilities {
 	 }*/
 	
 	
-	
+	As per the discussion regarding loading the Data Provider with multiple sets of data, you can make the following changes in your code:
+
+Create a method in Utility class:
+
+public String[][] getExcelDataForMarket(String fileName, String sheetName) {
+          String[][] arrayMarketData = null;
+          try {
+              FileInputStream fs = new FileInputStream(fileName);
+              Workbook wb = Workbook.getWorkbook(fs);
+              Sheet sheet = wb.getSheet(sheetName);
+
+              int totalNoOfCols = sheet.getColumns();
+              int totalNoOfRows = sheet.getRows();
+              
+              arrayMarketData = new String[totalNoOfRows-1][totalNoOfCols];
+              
+               for (int i= 1 ; i < totalNoOfRows; i++) {
+
+                   for (int j=0; j < totalNoOfCols; j++) {
+                        arrayMarketData[i-1][j] = sh.getCell(j, i).getContents();
+                   }
+
+              }
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+
+          return arrayMarketData;
+     }
+
+Create an Data Provider, below example shows DP for Orlando Sentinel [In the future we might create DP for different markets which feeds data from single Excel sheet]
+
+@DataProvider(name="dssExcelDataOS")
+public static Object[][]TestDataOrlandoSentinel() {
+//Note that the Excel sheet Path / sheet name are specified in the method, that will ensure data of all the markets in a single worksheet and different sheets inside for different markets
+          Object[][] arrayObject = getExcelDataForMarket("DSSProperties.PATH_OF_EXCEL","ORLANDO_SENTINEL");
+          //Note that the method loads the Object array of array as required by Data Provide
+          return arrayObject;
+     }
+
+Now simply call the test by providing all the data as arguments as opposed to passing one Map object:
+
+@Test(dataProvider="dssExcelDataOS")
+public void BuyPrintPlusDigitalSubscriptionWithinAreaZIPWithSSOR(String withInAreaZIP, String email, String CCName,
+              String CCNumber, String CCMonth, String CCYear, String userFirstName, String userLastName,
+              String userAddress1, String userAddress2, String UserZIP, String UserCity, String UserState,
+              String userPhonenmum, String pass) throws InterruptedException {
+
 	
 
 }
