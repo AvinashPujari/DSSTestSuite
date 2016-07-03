@@ -47,7 +47,7 @@ import junit.framework.Assert;
  * Test changes for POC II
  */
 
-public class SubscriptionTests {
+public class SubscriptionTest {
 
 	private WebDriver driver;
 
